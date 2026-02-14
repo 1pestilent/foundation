@@ -10,7 +10,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>foundation-starter-web</artifactId>
+	<artifactId>foundation-web-starter</artifactId>
 	<name>foundation-starter-web</name>
 	<description>web-starter for my foundation</description>
 

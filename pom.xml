@@ -20,7 +20,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>libs/foundation-starter-web</module>
+		<module>libs/foundation-web-starter</module>
         <module>libs/foundation-logging-starter</module>
 	</modules>
 
@@ -37,6 +37,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 	</dependencies>
 
