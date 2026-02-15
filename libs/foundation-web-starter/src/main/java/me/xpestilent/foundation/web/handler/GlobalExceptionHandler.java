@@ -24,9 +24,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAllExceptions(Exception exception) {
 
+        exceptionLoggerService.log(exception);
+
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("INTERNAL_SERVER_ERROR", exception.getMessage()));
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ApiResponse.error("INTERNAL_SERVER_ERROR", exception.getMessage()));
     }
 
     @ExceptionHandler(BusinessException.class)

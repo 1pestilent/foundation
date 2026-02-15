@@ -28,6 +28,7 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
