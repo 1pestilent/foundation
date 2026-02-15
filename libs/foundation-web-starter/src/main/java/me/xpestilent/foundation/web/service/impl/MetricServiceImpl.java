@@ -19,17 +19,20 @@ public class MetricServiceImpl implements MetricService {
 
     @Override
     public void enrich(ApiResponse<?> response, Throwable exception, HttpStatus httpStatus) {
-        String traceId = Optional.ofNullable(tracer.currentSpan())
-            .map(span -> span.context().traceId())
-            .orElse("unknown");
-        response.setTraceId(traceId);
+        if (tracer != null) {
+            String traceId = Optional.ofNullable(tracer.currentSpan())
+                .map(span -> span.context().traceId())
+                .orElse("n/a");
+            response.setTraceId(traceId);
+        }
 
-        List<Tag> tags = List.of(
-            Tag.of("exception", exception.getClass().getSimpleName()),
-            Tag.of("status", String.valueOf(httpStatus.value())),
-            Tag.of("outcome", httpStatus.series().name())
-        );
-
-        meterRegistry.counter("http.server.errors.total", tags).increment();
+        if (meterRegistry != null) {
+            List<Tag> tags = List.of(
+                Tag.of("exception", exception.getClass().getSimpleName()),
+                Tag.of("status", String.valueOf(httpStatus.value())),
+                Tag.of("outcome", httpStatus.series().name())
+            );
+            meterRegistry.counter("http.server.errors.total", tags).increment();
+        }
     }
 }

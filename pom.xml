@@ -30,6 +30,7 @@
 		<springdoc.version>3.0.1</springdoc.version>
 		<lombok.version>1.18.42</lombok.version>
 		<micrometer.version>1.6.3</micrometer.version>
+		<logback.encoder.version>9.0</logback.encoder.version>
 	</properties>
 
 
@@ -69,6 +70,14 @@
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
+			</dependency>
+
+			<!-- Source: https://mvnrepository.com/artifact/net.logstash.logback/logstash-logback-encoder -->
+			<dependency>
+				<groupId>net.logstash.logback</groupId>
+				<artifactId>logstash-logback-encoder</artifactId>
+				<version>${logback.encoder.version}</version>
+				<scope>compile</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
