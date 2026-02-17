@@ -10,4 +10,33 @@
     </parent>
 
     <artifactId>user-service-impl</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>me.xpestilent.foundation</groupId>
+            <artifactId>user-service-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-logging-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-web-starter</artifactId>
+        </dependency>
+    </dependencies>
 </project>

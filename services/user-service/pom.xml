@@ -17,18 +17,4 @@
         <module>user-service-impl</module>
         <module>user-service-api</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>me.xpestilent</groupId>
-            <artifactId>foundation-logging-starter</artifactId>
-            <version>v0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>me.xpestilent</groupId>
-            <artifactId>foundation-web-starter</artifactId>
-            <version>v0.1</version>
-        </dependency>
-    </dependencies>
 </project>
