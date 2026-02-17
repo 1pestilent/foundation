@@ -22,11 +22,13 @@
 	<modules>
 		<module>libs/foundation-web-starter</module>
         <module>libs/foundation-logging-starter</module>
-	</modules>
+        <module>services/user-service</module>
+    </modules>
 
 
 	<properties>
 		<java.version>21</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<springdoc.version>3.0.1</springdoc.version>
 		<lombok.version>1.18.42</lombok.version>
 		<micrometer.version>1.6.3</micrometer.version>
