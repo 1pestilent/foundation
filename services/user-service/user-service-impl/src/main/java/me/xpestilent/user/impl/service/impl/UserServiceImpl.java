@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.xpestilent.foundation.web.exception.BusinessException;
 import me.xpestilent.user.api.dto.request.UserCreateRequest;
 import me.xpestilent.user.api.dto.response.UserDetailedResponse;
+import me.xpestilent.user.api.enums.UserStatus;
 import me.xpestilent.user.impl.entity.UserEntity;
 import me.xpestilent.user.impl.mapper.UserMapper;
 import me.xpestilent.user.impl.repository.UserRepository;
@@ -12,6 +13,7 @@ import me.xpestilent.user.impl.service.RoleService;
 import me.xpestilent.user.impl.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -25,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
 
     @Override
+    @Transactional
     public UserDetailedResponse createUser(UserCreateRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException("Username is already exists", "USERNAME_ALREADY_EXISTS", HttpStatus.CONFLICT, Map.of("username", request.getUsername()));
@@ -35,6 +38,16 @@ public class UserServiceImpl implements UserService {
         }
 
         UserEntity userEntity = userMapper.toEntity(request);
-        return null;
+        userEntity.setStatus(UserStatus.NOT_VERIFIED);
+
+        roleService.assignDefaultRole(userEntity);
+
+        UserEntity createdUser = userRepository.save(userEntity);
+        log.atInfo()
+            .addKeyValue("userId", createdUser.getId())
+            .addKeyValue("username", createdUser.getUsername())
+            .log("User created");
+
+        return userMapper.toDto(createdUser);
     }
 }
