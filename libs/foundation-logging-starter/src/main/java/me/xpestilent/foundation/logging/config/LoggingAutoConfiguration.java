@@ -2,7 +2,10 @@ package me.xpestilent.foundation.logging.config;
 
 import me.xpestilent.foundation.logging.filter.MdcHeaderFilter;
 import me.xpestilent.foundation.logging.properties.LoggingProperties;
+import me.xpestilent.foundation.logging.service.ExceptionLoggerService;
+import me.xpestilent.foundation.logging.service.impl.ExceptionLoggerServiceImpl;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -39,6 +42,12 @@ public class LoggingAutoConfiguration {
 
         filter.setAfterMessagePrefix("REQUEST DATA: ");
         return filter;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ExceptionLoggerService exceptionLoggerService() {
+        return new ExceptionLoggerServiceImpl();
     }
 }
 

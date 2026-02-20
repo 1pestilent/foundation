@@ -1,16 +1,17 @@
 package me.xpestilent.foundation.web.config;
 
-import me.xpestilent.foundation.web.handler.GlobalExceptionHandler;
-import me.xpestilent.foundation.web.service.ExceptionLoggerService;
-import me.xpestilent.foundation.web.service.MetricService;
-import me.xpestilent.foundation.web.service.impl.ExceptionLoggerServiceImpl;
-import me.xpestilent.foundation.web.service.impl.MetricServiceImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.tracing.Tracer;
+import me.xpestilent.foundation.logging.service.ExceptionLoggerService;
+import me.xpestilent.foundation.logging.service.impl.ExceptionLoggerServiceImpl;
+import me.xpestilent.foundation.web.handler.GlobalExceptionHandler;
+import me.xpestilent.foundation.web.service.MetricService;
+import me.xpestilent.foundation.web.service.impl.MetricServiceImpl;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
+
 import java.util.Optional;
 
 @AutoConfiguration

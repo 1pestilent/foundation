@@ -1,4 +1,4 @@
-package me.xpestilent.foundation.web.service;
+package me.xpestilent.foundation.logging.service;
 
 import org.springframework.stereotype.Service;
 

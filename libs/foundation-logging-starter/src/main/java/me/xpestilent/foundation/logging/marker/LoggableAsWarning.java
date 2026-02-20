@@ -1,4 +1,4 @@
-package me.xpestilent.foundation.web.marker;
+package me.xpestilent.foundation.logging.marker;
 
 /**
  * Маркер для исключений.
