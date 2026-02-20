@@ -1,4 +1,4 @@
 package me.xpestilent.user.api.client;
 
-public interface UserClient {
+public interface UserApi {
 }
