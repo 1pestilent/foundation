@@ -36,6 +36,7 @@
         <logback.encoder.version>9.0</logback.encoder.version>
         <uuid-creator.version>6.1.1</uuid-creator.version>
         <swagger-annotations.version>2.2.43</swagger-annotations.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
     </properties>
 
 
@@ -114,6 +115,14 @@
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>${swagger-annotations.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <!-- Source: https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
                 <scope>compile</scope>
             </dependency>
         </dependencies>
