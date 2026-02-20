@@ -22,8 +22,9 @@
 	<modules>
 		<module>libs/foundation-web-starter</module>
         <module>libs/foundation-logging-starter</module>
+		<module>libs/foundation-common</module>
         <module>services/user-service</module>
-    </modules>
+	</modules>
 
 
 	<properties>
