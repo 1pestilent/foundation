@@ -41,6 +41,10 @@ public class GlobalExceptionHandler {
 
         ApiResponse<Void> response = ApiResponse.error(ex.getCode(), ex.getMessage());
 
+        if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+            response.getError().setDetails(ex.getDetails());
+        }
+
         metricService.ifPresent(service -> service.enrich(response, ex, ex.getStatus()));
 
         return ResponseEntity.status(ex.getStatus()).body(response);
