@@ -2,9 +2,9 @@ package me.xpestilent.foundation.web.handler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.xpestilent.foundation.logging.service.ExceptionLoggerService;
 import me.xpestilent.foundation.web.exception.BusinessException;
 import me.xpestilent.foundation.web.response.ApiResponse;
-import me.xpestilent.foundation.web.service.ExceptionLoggerService;
 import me.xpestilent.foundation.web.service.MetricService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +40,10 @@ public class GlobalExceptionHandler {
         exceptionLoggerService.log(ex);
 
         ApiResponse<Void> response = ApiResponse.error(ex.getCode(), ex.getMessage());
+
+        if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
+            response.getError().setDetails(ex.getDetails());
+        }
 
         metricService.ifPresent(service -> service.enrich(response, ex, ex.getStatus()));
 

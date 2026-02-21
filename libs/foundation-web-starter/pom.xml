@@ -15,6 +15,17 @@
     <description>web-starter for my foundation</description>
 
     <dependencies>
+
+        <dependency>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-logging-starter</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -26,30 +37,18 @@
         </dependency>
 
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-tracing-bridge-brave</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>me.xpestilent</groupId>
-            <artifactId>foundation-logging-starter</artifactId>
-            <version>v0.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
         </dependency>
     </dependencies>
 </project>
