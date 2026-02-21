@@ -5,8 +5,7 @@ import me.xpestilent.foundation.logging.marker.LoggableAsError;
 import me.xpestilent.foundation.logging.marker.LoggableAsWarning;
 import me.xpestilent.foundation.logging.marker.NotLoggable;
 import me.xpestilent.foundation.logging.service.ExceptionLoggerService;
-import me.xpestilent.foundation.web.exception.BusinessException;
-import me.xpestilent.foundation.web.exception.SystemException;
+import me.xpestilent.foundation.web.exception.DetailedException;
 import org.slf4j.spi.LoggingEventBuilder;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +28,8 @@ public class ExceptionLoggerServiceImpl implements ExceptionLoggerService {
             logBuilder = log.atError().setCause(ex);
         }
 
-        if (ex instanceof BusinessException bizEx && !bizEx.getDetails().isEmpty()) {
-            bizEx.getDetails().forEach(logBuilder::addKeyValue);
-        } else if (ex instanceof SystemException sysEx && !sysEx.getDetails().isEmpty()) {
-            sysEx.getDetails().forEach(logBuilder::addKeyValue);
+        if (ex instanceof DetailedException detailedEx && !detailedEx.getDetails().isEmpty()) {
+            detailedEx.getDetails().forEach(logBuilder::addKeyValue);
         }
 
         logBuilder.log(message);

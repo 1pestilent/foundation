@@ -7,10 +7,10 @@ import java.util.Collections;
 import java.util.Map;
 
 @Getter
-public class SystemException extends RuntimeException {
+public class SystemException extends RuntimeException implements DetailedException {
 
     private final String code;
-    private final HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR; // Системная ошибка - это всегда 500
+    private final HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
     private final Map<String, Object> details;
 
     public SystemException(String message, String code) {

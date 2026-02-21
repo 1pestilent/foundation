@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.Map;
 
 @Getter
-public class BusinessException extends RuntimeException {
+public class BusinessException extends RuntimeException implements DetailedException{
+
     private final String code;
     private final HttpStatus status;
     private final Map<String, Object> details;
