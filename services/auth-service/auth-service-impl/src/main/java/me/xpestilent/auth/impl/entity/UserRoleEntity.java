@@ -1,13 +1,12 @@
-package me.xpestilent.user.impl.entity;
+package me.xpestilent.auth.impl.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import me.xpestilent.user.impl.entity.key.UserRoleId;
+import me.xpestilent.auth.impl.entity.key.UserRoleId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.time.Instant;
 import java.util.UUID;
 

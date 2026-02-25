@@ -1,13 +1,13 @@
-package me.xpestilent.user.impl.service.impl;
+package me.xpestilent.auth.impl.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import me.xpestilent.auth.impl.entity.RoleEntity;
+import me.xpestilent.auth.impl.entity.UserEntity;
+import me.xpestilent.auth.impl.entity.UserRoleEntity;
+import me.xpestilent.auth.impl.entity.key.UserRoleId;
+import me.xpestilent.auth.impl.repository.RoleRepository;
+import me.xpestilent.auth.impl.service.RoleService;
 import me.xpestilent.foundation.web.exception.SystemException;
-import me.xpestilent.user.impl.entity.RoleEntity;
-import me.xpestilent.user.impl.entity.UserEntity;
-import me.xpestilent.user.impl.entity.UserRoleEntity;
-import me.xpestilent.user.impl.entity.key.UserRoleId;
-import me.xpestilent.user.impl.repository.RoleRepository;
-import me.xpestilent.user.impl.service.RoleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

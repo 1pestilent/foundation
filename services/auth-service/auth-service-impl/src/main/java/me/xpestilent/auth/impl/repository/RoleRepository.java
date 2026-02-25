@@ -1,13 +1,13 @@
-package me.xpestilent.user.impl.repository;
+package me.xpestilent.auth.impl.repository;
 
-import me.xpestilent.user.impl.entity.RoleEntity;
+import me.xpestilent.auth.impl.entity.RoleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface RoleRepository extends JpaRepository<RoleEntity, Integer> {
-
+public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
+    
     Optional<RoleEntity> findByName(String name);
 }

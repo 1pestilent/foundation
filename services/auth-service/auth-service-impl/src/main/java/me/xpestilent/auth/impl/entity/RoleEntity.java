@@ -1,4 +1,4 @@
-package me.xpestilent.user.impl.entity;
+package me.xpestilent.auth.impl.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
