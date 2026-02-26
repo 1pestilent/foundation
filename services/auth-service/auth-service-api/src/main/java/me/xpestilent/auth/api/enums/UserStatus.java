@@ -1,4 +1,4 @@
-package me.xpestilent.user.api.enums;
+package me.xpestilent.auth.api.enums;
 
 import lombok.AllArgsConstructor;
 

@@ -24,6 +24,7 @@
         <module>libs/foundation-logging-starter</module>
         <module>libs/foundation-common</module>
         <module>services/user-service</module>
+        <module>services/auth-service</module>
     </modules>
 
 

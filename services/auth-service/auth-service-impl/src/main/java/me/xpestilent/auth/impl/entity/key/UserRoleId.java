@@ -1,4 +1,4 @@
-package me.xpestilent.user.impl.entity.key;
+package me.xpestilent.auth.impl.entity.key;
 
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;

@@ -26,11 +26,6 @@ public class UserCreateRequest {
     @Schema(description = "Электронная почта", example = "john.doe@example.com")
     private String email;
 
-    @NotBlank(message = "Пароль не может быть пустым")
-    @Size(min = 6, message = "Пароль должен содержать минимум 6 символов")
-    @Schema(description = "Пароль (в открытом виде, будет захеширован)", example = "SecurePass123!")
-    private String password;
-
     @Schema(description = "Имя пользователя", example = "John")
     private String firstName;
 

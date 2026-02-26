@@ -11,11 +11,11 @@
     </parent>
 
     <groupId>me.xpestilent.foundation</groupId>
-    <artifactId>user-service</artifactId>
+    <artifactId>auth-service</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>user-service-impl</module>
-        <module>user-service-api</module>
+        <module>auth-service-api</module>
+        <module>auth-service-impl</module>
     </modules>
 </project>
