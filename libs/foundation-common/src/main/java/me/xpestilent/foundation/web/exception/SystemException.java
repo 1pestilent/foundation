@@ -22,4 +22,10 @@ public class SystemException extends RuntimeException implements DetailedExcepti
         this.code = code;
         this.details = details != null ? details : Collections.emptyMap();
     }
+
+    public SystemException(String message, String code, Throwable cause, Map<String, Object> details) {
+        super(message, cause);
+        this.code = code;
+        this.details = details != null ? details : Collections.emptyMap();
+    }
 }

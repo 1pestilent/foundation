@@ -14,6 +14,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-common</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
         </dependency>
@@ -53,6 +58,16 @@
             <groupId>me.xpestilent</groupId>
             <artifactId>foundation-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 
