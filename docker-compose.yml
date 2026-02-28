@@ -4,7 +4,7 @@ services:
   # База данных для auth-service
   auth-db:
     image: postgres:17
-    container_name: auth-db
+    container_name: foundation-auth-db
     environment:
       POSTGRES_DB: auth_db
       POSTGRES_USER: admin
@@ -22,7 +22,7 @@ services:
   # База данных для user-service
   user-db:
     image: postgres:17
-    container_name: user-db
+    container_name: foundation-user-db
     environment:
       POSTGRES_DB: user_db
       POSTGRES_USER: admin
