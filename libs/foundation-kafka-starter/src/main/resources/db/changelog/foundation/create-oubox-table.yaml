@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-outbox-table
+      author: foundation
+      changes:
+        - createTable:
+            tableName: outbox_messages
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: aggregate_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: aggregate_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: trace_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: payload
+                  type: jsonb
+                  constraints:
+                    nullable: false

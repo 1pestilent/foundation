@@ -22,6 +22,7 @@
     <modules>
         <module>libs/foundation-web-starter</module>
         <module>libs/foundation-logging-starter</module>
+        <module>libs/foundation-kafka-starter</module>
         <module>libs/foundation-common</module>
         <module>services/user-service</module>
         <module>services/auth-service</module>
