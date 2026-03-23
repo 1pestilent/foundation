@@ -34,3 +34,4 @@ foundation:
       issuer: auth-service
       public-key-path: classpath:keys/public_key.pem
       private-key-path: classpath:keys/private_key_pkcs8.der
+      cleanup-cron: "*/10 * * * * *"
