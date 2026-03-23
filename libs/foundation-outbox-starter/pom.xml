@@ -10,17 +10,12 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>foundation-kafka-starter</artifactId>
+    <artifactId>foundation-outbox-starter</artifactId>
     <dependencies>
 
         <dependency>
             <groupId>me.xpestilent</groupId>
             <artifactId>foundation-common</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
         </dependency>
 
         <dependency>
@@ -52,12 +47,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>me.xpestilent</groupId>
-            <artifactId>foundation-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

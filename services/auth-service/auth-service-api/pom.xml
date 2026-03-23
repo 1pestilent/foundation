@@ -10,4 +10,10 @@
     </parent>
 
     <artifactId>auth-service-api</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-common</artifactId>
+        </dependency>
+    </dependencies>
 </project>
