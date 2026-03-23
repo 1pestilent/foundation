@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/changesets/01-init-db.yaml
   - include:
       file: db/changelog/foundation/create-oubox-table.yaml
+  - include:
+      file: db/changelog/changesets/02-create-refresh-token-table.yaml

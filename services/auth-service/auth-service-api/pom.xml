@@ -15,5 +15,12 @@
             <groupId>me.xpestilent</groupId>
             <artifactId>foundation-common</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 </project>

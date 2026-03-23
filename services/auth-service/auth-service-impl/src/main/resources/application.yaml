@@ -19,3 +19,18 @@ spring:
 
 server:
   port: 8081
+
+foundation:
+  security:
+    jwt:
+      type:
+        access: access
+        refresh: refresh
+        tokens: Bearer
+      expiration:
+        access: 3600000
+        refresh: 2592000000
+      algorithm: RSA
+      issuer: auth-service
+      public-key-path: classpath:keys/public_key.pem
+      private-key-path: classpath:keys/private_key_pkcs8.der
