@@ -4,6 +4,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import me.xpestilent.auth.api.enums.UserStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "users")
 @NoArgsConstructor

@@ -3,12 +3,14 @@ package me.xpestilent.foundation.web.config;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.tracing.Tracer;
 import me.xpestilent.foundation.logging.service.ExceptionLoggerService;
+import me.xpestilent.foundation.web.handler.ApiResponseTraceIdAdvice;
 import me.xpestilent.foundation.web.handler.GlobalExceptionHandler;
 import me.xpestilent.foundation.web.service.MetricService;
 import me.xpestilent.foundation.web.service.impl.MetricServiceImpl;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Optional;
@@ -18,9 +20,15 @@ public class WebAutoConfiguration {
 
     @Bean
     @ConditionalOnClass(Tracer.class)
-    public MetricService metricService(ObjectProvider<Tracer> tracerProvider, ObjectProvider<MeterRegistry> meterRegistry) {
+    public MetricService metricService(ObjectProvider<MeterRegistry> meterRegistry) {
 
-        return new MetricServiceImpl(tracerProvider.getIfAvailable(), meterRegistry.getIfAvailable());
+        return new MetricServiceImpl(meterRegistry.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ApiResponseTraceIdAdvice apiResponseTraceIdAdvice(Tracer tracer) {
+        return new ApiResponseTraceIdAdvice(tracer);
     }
 
     @Bean

@@ -1,8 +1,9 @@
 package me.xpestilent.auth.impl.service;
 
 import me.xpestilent.auth.api.dto.request.RegisterRequest;
+import me.xpestilent.auth.api.dto.response.RegisterResponse;
 
 public interface UserService {
 
-    void register(RegisterRequest request);
+    RegisterResponse register(RegisterRequest request);
 }

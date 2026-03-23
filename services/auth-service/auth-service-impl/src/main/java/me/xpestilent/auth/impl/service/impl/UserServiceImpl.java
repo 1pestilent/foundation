@@ -1,7 +1,14 @@
 package me.xpestilent.auth.impl.service.impl;
 
+import com.github.f4b6a3.uuid.UuidCreator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.xpestilent.auth.api.dto.request.RegisterRequest;
+import me.xpestilent.auth.api.dto.response.RegisterResponse;
+import me.xpestilent.auth.api.event.UserRegisteredEvent;
+import me.xpestilent.auth.impl.entity.UserEntity;
+import me.xpestilent.auth.impl.mapper.UserMapper;
 import me.xpestilent.auth.impl.repository.UserRepository;
 import me.xpestilent.auth.impl.service.RoleService;
 import me.xpestilent.auth.impl.service.UserService;
@@ -14,29 +21,56 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final RoleService roleService;
     private final EventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void register(RegisterRequest request) {
+    @Transactional
+    public RegisterResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
             Map<String, Object> details = new HashMap<>();
             details.put("username", request.username());
             throw new BusinessException("Username already taken", "409", HttpStatus.CONFLICT, details);
         }
 
-        if (userRepository.existsByUsername(request.username())) {
+        if (userRepository.existsByEmail(request.email())) {
             Map<String, Object> details = new HashMap<>();
             details.put("username", request.email());
             throw new BusinessException("Email already taken", "409", HttpStatus.CONFLICT, details);
         }
 
+        UserEntity user = userMapper.registerUser(request);
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
 
+        roleService.assignDefaultRole(user);
+        user = userRepository.save(user);
+
+        log.debug("User entity successfully saved to database", keyValue("userId", user.getId()));
+
+        UserRegisteredEvent event = UserRegisteredEvent.builder()
+            .eventId(UuidCreator.getTimeOrderedEpoch())
+            .aggregateId(user.getId().toString())
+            .username(user.getUsername())
+            .email(user.getEmail())
+            .build();
+
+        eventPublisher.publish(event);
+
+        log.info("User successfully registered and event published",
+            keyValue("eventId", event.getEventId()),
+            keyValue("userId", event.getAggregateId()),
+            keyValue("username", user.getUsername()));
+
+        return new RegisterResponse(user.getId(), user.getStatus(), "Пользователь успешно зарегистрирован. Пожалуйста, подтвердите email.");
     }
 }

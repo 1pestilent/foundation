@@ -12,13 +12,16 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ApiResponse<T> {
-    private T content;
+
+    private boolean success;
+    private int status;
+    private T data;
+    private ErrorDetails error;
     private String traceId;
 
     @Builder.Default
     private Instant timestamp = Instant.now();
 
-    private ErrorDetails error;
 
     @Data
     @Builder
@@ -31,12 +34,21 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(T content) {
-        return ApiResponse.<T>builder().content(content).build();
+        return ApiResponse.<T>builder().data(content).build();
+    }
+
+    public static <T> ApiResponse<T> success(T content, int status) {
+        return ApiResponse.<T>builder()
+            .success(true)
+            .status(201)
+            .data(content)
+            .build();
     }
 
     public static ApiResponse<Void> error(String code, String message) {
         return ApiResponse.<Void>builder()
-                .error(new ErrorDetails(code, message, null))
-                .build();
+            .success(false)
+            .error(new ErrorDetails(code, message, null))
+            .build();
     }
 }

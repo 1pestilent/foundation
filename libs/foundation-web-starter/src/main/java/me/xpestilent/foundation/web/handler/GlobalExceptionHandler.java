@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
             response.getError().setDetails(ex.getDetails());
         }
 
-        metricService.ifPresent(service -> service.enrich(response, ex, ex.getStatus()));
+        metricService.ifPresent(service -> service.recordError(ex, ex.getStatus()));
 
         return ResponseEntity.status(ex.getStatus()).body(response);
     }
@@ -57,10 +57,11 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error ->
             errors.put(error.getField(), error.getDefaultMessage()));
 
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         ApiResponse<Void> response = ApiResponse.error("VALIDATION_ERROR", "Ошибка валидации");
         response.getError().setDetails(errors);
 
-        metricService.ifPresent(service -> service.enrich(response, ex, HttpStatus.BAD_REQUEST));
+        metricService.ifPresent(service -> service.recordError(ex, status));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
@@ -72,7 +73,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ApiResponse<Void> response = ApiResponse.error("BAD_REQUEST", ex.getMessage());
 
-        metricService.ifPresent(service -> service.enrich(response, ex, status));
+        metricService.ifPresent(service -> service.recordError(ex, status));
 
         return ResponseEntity.status(status).body(response);
     }
