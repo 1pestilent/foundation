@@ -76,6 +76,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>me.xpestilent</groupId>
+                <artifactId>foundation-outbox-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Source: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
             <dependency>
                 <groupId>org.springdoc</groupId>
@@ -106,7 +112,7 @@
                 <version>${mapstruct.version}</version>
                 <scope>compile</scope>
             </dependency>
-            
+
             <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok-mapstruct-binding -->
             <dependency>
                 <groupId>org.projectlombok</groupId>

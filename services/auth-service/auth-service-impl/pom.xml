@@ -48,7 +48,6 @@
         <dependency>
             <groupId>me.xpestilent</groupId>
             <artifactId>foundation-outbox-starter</artifactId>
-            <version>v0.1</version>
         </dependency>
 
         <dependency>
@@ -67,7 +66,6 @@
             <scope>runtime</scope>
         </dependency>
 
-
         <dependency>
             <groupId>com.github.f4b6a3</groupId>
             <artifactId>uuid-creator</artifactId>
@@ -76,6 +74,11 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
         </dependency>
     </dependencies>
 
