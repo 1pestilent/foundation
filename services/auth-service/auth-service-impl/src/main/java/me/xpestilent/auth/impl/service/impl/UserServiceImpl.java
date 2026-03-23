@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
@@ -37,17 +36,24 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public RegisterResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.username())) {
-            Map<String, Object> details = new HashMap<>();
-            details.put("username", request.username());
-            throw new BusinessException("Username already taken", "USERNAME_BUSY", HttpStatus.CONFLICT, details);
-        }
-
-        if (userRepository.existsByEmail(request.email())) {
-            Map<String, Object> details = new HashMap<>();
-            details.put("username", request.email());
-            throw new BusinessException("Email already taken", "EMAIL_BUSY", HttpStatus.CONFLICT, details);
-        }
+        userRepository.findByUsernameOrEmail(request.username(), request.email())
+            .ifPresent(user -> {
+                if (user.getUsername().equals(request.username())) {
+                    throw new BusinessException(
+                        "Username already taken",
+                        "AUTH_USERNAME_TAKEN",
+                        HttpStatus.CONFLICT,
+                        Map.of("username", request.username())
+                    );
+                } else {
+                    throw new BusinessException(
+                        "Email already taken",
+                        "AUTH_EMAIL_TAKEN",
+                        HttpStatus.CONFLICT,
+                        Map.of("email", request.email())
+                    );
+                }
+            });
 
         UserEntity user = userMapper.registerUser(request);
         user.setPasswordHash(passwordEncoder.encode(request.password()));

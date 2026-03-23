@@ -8,6 +8,7 @@ import lombok.Setter;
 import me.xpestilent.auth.api.enums.UserStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @Table(name = "users")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class UserEntity {
+public class UserEntity implements Persistable<UUID> {
 
     @Id
     @Column(name = "id")
@@ -51,4 +52,18 @@ public class UserEntity {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Transient
+    private boolean isNew = true;
+
+    @Override
+    public boolean isNew() {
+        return this.isNew;
+    }
+
+    @PostPersist
+    @PostLoad
+    void markNotNew() {
+        this.isNew = false;
+    }
 }

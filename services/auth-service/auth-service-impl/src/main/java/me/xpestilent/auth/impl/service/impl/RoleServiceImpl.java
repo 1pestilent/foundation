@@ -9,6 +9,7 @@ import me.xpestilent.auth.impl.entity.key.UserRoleId;
 import me.xpestilent.auth.impl.repository.RoleRepository;
 import me.xpestilent.auth.impl.service.RoleService;
 import me.xpestilent.foundation.web.exception.SystemException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
 
     @Override
+    @Cacheable(value = "roles", key = "#name")
     public RoleEntity getRoleByName(String name) {
         log.debug("Fetching role by name", keyValue("roleName", name));
 
