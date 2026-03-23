@@ -45,10 +45,19 @@ public class ApiResponse<T> {
             .build();
     }
 
-    public static ApiResponse<Void> error(String code, String message) {
+    public static ApiResponse<Void> error(int status, String code, String message) {
         return ApiResponse.<Void>builder()
+            .status(status)
             .success(false)
             .error(new ErrorDetails(code, message, null))
+            .build();
+    }
+
+    public static ApiResponse<Void> error(int status, String code, String message, Object details) {
+        return ApiResponse.<Void>builder()
+            .status(status)
+            .success(false)
+            .error(new ErrorDetails(code, message, details))
             .build();
     }
 }

@@ -28,10 +28,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleAllExceptions(Exception exception) {
 
         exceptionLoggerService.log(exception);
-
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error("INTERNAL_SERVER_ERROR", exception.getMessage()));
+            .body(ApiResponse.error(status.value(), status.getReasonPhrase(), exception.getMessage()));
     }
 
     @ExceptionHandler(BusinessException.class)
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
 
         exceptionLoggerService.log(ex);
 
-        ApiResponse<Void> response = ApiResponse.error(ex.getCode(), ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(ex.getStatus().value(), ex.getCode(), ex.getMessage());
 
         if (ex.getDetails() != null && !ex.getDetails().isEmpty()) {
             response.getError().setDetails(ex.getDetails());
@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage()));
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ApiResponse<Void> response = ApiResponse.error("VALIDATION_ERROR", "Ошибка валидации");
+        ApiResponse<Void> response = ApiResponse.error(status.value(), status.getReasonPhrase(), "Ошибка валидации");
         response.getError().setDetails(errors);
 
         metricService.ifPresent(service -> service.recordError(ex, status));
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
         exceptionLoggerService.log(ex);
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ApiResponse<Void> response = ApiResponse.error("BAD_REQUEST", ex.getMessage());
+        ApiResponse<Void> response = ApiResponse.error(status.value(), status.getReasonPhrase(), ex.getMessage());
 
         metricService.ifPresent(service -> service.recordError(ex, status));
 

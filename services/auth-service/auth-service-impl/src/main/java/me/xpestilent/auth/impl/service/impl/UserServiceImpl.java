@@ -40,13 +40,13 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByUsername(request.username())) {
             Map<String, Object> details = new HashMap<>();
             details.put("username", request.username());
-            throw new BusinessException("Username already taken", "409", HttpStatus.CONFLICT, details);
+            throw new BusinessException("Username already taken", "USERNAME_BUSY", HttpStatus.CONFLICT, details);
         }
 
         if (userRepository.existsByEmail(request.email())) {
             Map<String, Object> details = new HashMap<>();
             details.put("username", request.email());
-            throw new BusinessException("Email already taken", "409", HttpStatus.CONFLICT, details);
+            throw new BusinessException("Email already taken", "EMAIL_BUSY", HttpStatus.CONFLICT, details);
         }
 
         UserEntity user = userMapper.registerUser(request);
