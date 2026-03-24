@@ -4,7 +4,7 @@ spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:postgresql://localhost:5433/auth_db
+    url: jdbc:postgresql://localhost:5432/foundation_db?currentSchema=auth_schema
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
@@ -15,7 +15,7 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/changelog.yaml
-    default-schema: public
+    default-schema: auth_schema
 
 logging:
   level:

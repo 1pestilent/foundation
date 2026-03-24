@@ -1,0 +1,24 @@
+{
+  "name": "foundation-outbox-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "admin",
+    "database.password": "admin",
+    "database.dbname": "foundation_db",
+    "topic.prefix": "events",
+    "plugin.name": "pgoutput",
+    "schema.include.list": "auth_schema,user_schema",
+    "table.include.list": "auth_schema.outbox_messages,user_schema.outbox_messages",
+    "transforms": "outbox",
+    "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+    "transforms.outbox.route.topic.replacement": "${routedByValue}",
+    "transforms.outbox.table.fields.additional.placement": "type:header:eventType,trace_id:header:traceId",
+    "transforms.outbox.table.field.event.key": "aggregate_id",
+    "transforms.outbox.route.by.field": "aggregate_type",
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.storage.StringConverter"
+  }
+}

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.GlobalOpenApiCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ public class SwaggerAutoConfiguration {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
+            .addServersItem(new Server().url("/"))
             .info(new Info()
                 .title("Auth Service API")
                 .version("1.0")

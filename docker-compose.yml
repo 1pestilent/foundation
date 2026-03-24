@@ -1,42 +1,99 @@
 version: "3.9"
 services:
 
-  # База данных для auth-service
-  auth-db:
+  # База данных
+  postgres:
     image: postgres:17
-    container_name: foundation-auth-db
-    environment:
-      POSTGRES_DB: auth_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-    ports:
-      - "5433:5432"
-    volumes:
-      - auth_db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d auth_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  # База данных для user-service
-  user-db:
-    image: postgres:17
-    container_name: foundation-user-db
-    environment:
-      POSTGRES_DB: user_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+    container_name: foundation-db
     ports:
       - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: foundation_db
+    command: [ "postgres", "-c", "wal_level=logical" ]
     volumes:
-      - user_db_data:/var/lib/postgresql/data
+      - foundation_db_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+  kafka:
+    image: bitnamilegacy/kafka:3.7.0
+    container_name: foundation-kafka
+    ports:
+      - "19092:19092"
+    volumes:
+      - kafka-data:/bitnami/kafka
+    environment:
+      - KAFKA_KRAFT_CLUSTER_ID=949b3cb9-d766-4961-9177-d8e27575e96a
+      - KAFKA_CFG_BROKER_ID=1
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:19092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:19092
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_CFG_NUM_PARTITIONS=3
+      - KAFKA_CFG_MIN_INSYNC_REPLICAS=1
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR=1
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d user_db"]
-      interval: 5s
+      test: [ "CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list > /dev/null || exit 1" ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  connect:
+    image: debezium/connect:2.5.4.Final
+    container_name: foundation-kafka-connect
+    ports:
+      - "9083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: 'kafka:9092'
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_PLUGIN_PATH: "/kafka/connect"
+    depends_on:
+      postgres:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/connectors" ]
+      interval: 10s
       timeout: 5s
       retries: 5
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: foundation-kafka-ui
+    ports:
+      - "9080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "local-kafka-cluster"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: "local-debezium"
+      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: "http://connect:8083"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      connect:
+        condition: service_healthy
+
 volumes:
-  user_db_data:
-  auth_db_data:
+  foundation_db_data:
+  kafka-data:
