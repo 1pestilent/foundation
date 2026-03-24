@@ -1,0 +1,6 @@
+foundation:
+  security:
+    jwt:
+      algorithm: RSA
+      issuer: auth-service
+      public-key-path: classpath:keys/public_key.pem

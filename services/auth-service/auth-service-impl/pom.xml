@@ -40,9 +40,8 @@
         </dependency>
 
         <dependency>
-            <groupId>me.xpestilent.foundation</groupId>
-            <artifactId>auth-service-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>me.xpestilent</groupId>
+            <artifactId>foundation-security-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -101,6 +100,17 @@
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-provider-jdbc-template</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

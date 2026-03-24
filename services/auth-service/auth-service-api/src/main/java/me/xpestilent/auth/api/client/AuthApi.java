@@ -3,6 +3,7 @@ package me.xpestilent.auth.api.client;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import me.xpestilent.auth.api.dto.request.LoginRequest;
+import me.xpestilent.auth.api.dto.request.RefreshRequest;
 import me.xpestilent.auth.api.dto.request.RegisterRequest;
 import me.xpestilent.auth.api.dto.response.LoginResponse;
 import me.xpestilent.auth.api.dto.response.RegisterResponse;
@@ -22,7 +23,15 @@ public interface AuthApi {
     @ResponseStatus(HttpStatus.OK)
     ApiResponse<LoginResponse> login(
         @RequestBody LoginRequest request,
-        HttpServletRequest httpRequest,
-        @RequestHeader(value = "X-Device-Id", required = false) String deviceId
+        HttpServletRequest httpRequest
     );
+
+    @PostMapping("/refresh")
+    ApiResponse<LoginResponse> refresh(
+        HttpServletRequest httpRequest,
+        @Valid @RequestBody RefreshRequest request
+    );
+
+    @GetMapping(value = "/public-key", produces = "text/plain")
+    String getPublicKey();
 }

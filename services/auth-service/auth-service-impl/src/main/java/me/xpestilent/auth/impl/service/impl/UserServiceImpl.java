@@ -1,6 +1,7 @@
 package me.xpestilent.auth.impl.service.impl;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +137,65 @@ public class UserServiceImpl implements UserService {
             tokensType,
             accessExpiration / 1000,
             access.expiresAt().toEpochMilli()
+        );
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse refresh(String refreshToken, String ip, String userAgent, String deviceId) {
+
+        Claims claims;
+
+        try {
+            claims = jwtService.parseToken(refreshToken);
+        } catch (Exception e) {
+            log.warn("Invalid refresh token provided", keyValue("error", e.getMessage()));
+            throw new BusinessException("Невалидный токен обновления", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!"refresh".equals(claims.get("typ"))) {
+            throw new BusinessException("Ожидается токен типа refresh", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        }
+
+        UUID jti = UUID.fromString(claims.get("jti", String.class));
+        RefreshTokenEntity session = refreshTokenRepository.findById(jti)
+            .orElseThrow(() -> {
+                log.warn("Refresh token reuse attempt or session expired", keyValue("jti", jti));
+                return new BusinessException("Сессия не найдена или уже обновлена", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+            });
+
+        if (session.getDeviceId() != null && !session.getDeviceId().equals(deviceId)) {
+            log.error("Device ID mismatch! Deleting compromised session.", keyValue("jti", jti));
+            refreshTokenRepository.delete(session);
+            throw new BusinessException("Попытка доступа с неизвестного устройства", "FORBIDDEN", HttpStatus.FORBIDDEN);
+        }
+
+        UserEntity user = session.getUser();
+        refreshTokenRepository.delete(session);
+
+        UUID newJti = UuidCreator.getTimeOrderedEpoch();
+        GeneratedToken newAccess = jwtService.generateAccessToken(user, newJti);
+        GeneratedToken newRefresh = jwtService.generateRefreshToken(user, newJti);
+
+        RefreshTokenEntity newSession = RefreshTokenEntity.builder()
+            .jti(newJti)
+            .user(user)
+            .ipAddress(ip)
+            .userAgent(userAgent)
+            .deviceId(deviceId)
+            .expiresAt(newRefresh.expiresAt())
+            .build();
+
+        refreshTokenRepository.save(newSession);
+
+        log.info("Token successfully rotated", keyValue("userId", user.getId()), keyValue("oldJti", jti), keyValue("newJti", newJti));
+
+        return new LoginResponse(
+            newAccess.token(),
+            newRefresh.token(),
+            tokensType,
+            accessExpiration / 1000,
+            newAccess.expiresAt().toEpochMilli()
         );
     }
 }

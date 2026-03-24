@@ -17,6 +17,10 @@ spring:
     change-log: classpath:db/changelog/changelog.yaml
     default-schema: public
 
+logging:
+  level:
+    me.xpestilent.foundation.outbox: DEBUG
+
 server:
   port: 8081
 
@@ -35,3 +39,7 @@ foundation:
       public-key-path: classpath:keys/public_key.pem
       private-key-path: classpath:keys/private_key_pkcs8.der
       cleanup-cron: "*/10 * * * * *"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs/auth
