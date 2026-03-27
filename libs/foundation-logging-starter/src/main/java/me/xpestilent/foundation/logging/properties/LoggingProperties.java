@@ -8,8 +8,8 @@ import java.util.Set;
 
 /**
  * Класс конфигурации для управления настройками логирования.
- * Читает свойства из application.yaml с префиксом "foundation.logging".
- *
+ * <p>
+ * Параметры загружаются из файла {@code application.yaml} по префиксу {@code foundation.logging}.
  * @author Mikhail Ermakov
  * @since 16/01/2025
  */

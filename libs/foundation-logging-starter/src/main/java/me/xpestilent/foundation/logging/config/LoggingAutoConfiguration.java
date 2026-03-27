@@ -1,9 +1,11 @@
 package me.xpestilent.foundation.logging.config;
 
+import io.micrometer.tracing.Tracer;
 import me.xpestilent.foundation.logging.filter.MdcHeaderFilter;
 import me.xpestilent.foundation.logging.properties.LoggingProperties;
 import me.xpestilent.foundation.logging.service.ExceptionLoggerService;
 import me.xpestilent.foundation.logging.service.impl.ExceptionLoggerServiceImpl;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,21 +16,36 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
+
+/**
+ * Автоконфигурация модуля логирования и трассировки.
+ * <p>
+ * Что настраивает этот класс:
+ * <ul>
+ * <li>{@link MdcHeaderFilter} с наивысшим приоритетом. Перехватывает HTTP-запросы
+ * раньше всех и добавляют туда данные для трассировки</li>
+ * <li>{@link CommonsRequestLoggingFilter} детально логирует входящие HTTP-запросы
+ * (тело, заголовки, параметры), если это разрешено в настройках.</li>
+ * <li>{@link ExceptionLoggerService} занимается маршрутизации исключений по уровням логирования.</li>
+ * </ul>
+ */
 @AutoConfiguration
 @EnableConfigurationProperties(LoggingProperties.class)
 @ConditionalOnWebApplication
 public class LoggingAutoConfiguration {
 
     @Bean
-    public MdcHeaderFilter mdcHeaderFilter(LoggingProperties properties) {
-        return new MdcHeaderFilter(properties);
-    }
+    public FilterRegistrationBean<MdcHeaderFilter> mdcHeaderFilter(
+        LoggingProperties loggingProperties,
+        ObjectProvider<Tracer> tracerProvider) {
 
-    @Bean
-    public FilterRegistrationBean<MdcHeaderFilter> mdcHeaderFilterRegistration(MdcHeaderFilter filter) {
-        FilterRegistrationBean<MdcHeaderFilter> registration = new FilterRegistrationBean<>(filter);
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
-        return registration;
+        FilterRegistrationBean<MdcHeaderFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new MdcHeaderFilter(
+            loggingProperties,
+            tracerProvider.getIfAvailable()
+        ));
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registrationBean;
     }
 
     @Bean
@@ -50,4 +67,3 @@ public class LoggingAutoConfiguration {
         return new ExceptionLoggerServiceImpl();
     }
 }
-
