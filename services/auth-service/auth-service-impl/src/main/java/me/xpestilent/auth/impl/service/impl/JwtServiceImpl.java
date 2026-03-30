@@ -36,8 +36,10 @@ public class JwtServiceImpl implements JwtService {
     private final String issuer;
     private final long accessExpiration;
     private final long refreshExpiration;
+    private final long verificationExpiration;
     private final String accessTokenType;
     private final String refreshTokenType;
+    private final String verificationTokenType;
 
     public JwtServiceImpl(
         @Value("${foundation.security.jwt.private-key-path}") Resource privateKeyResource,
@@ -45,8 +47,10 @@ public class JwtServiceImpl implements JwtService {
         @Value("${spring.application.name}") String issuer,
         @Value("${foundation.security.jwt.expiration.access}") long accessExpiration,
         @Value("${foundation.security.jwt.expiration.refresh}") long refreshExpiration,
+        @Value("${foundation.security.jwt.expiration.verification}") long verificationExpiration,
         @Value("${foundation.security.jwt.type.access}") String accessTokenType,
         @Value("${foundation.security.jwt.type.refresh}") String refreshTokenType,
+        @Value("${foundation.security.jwt.type.verification}") String verificationTokenType,
         @Value("${foundation.security.jwt.algorithm}") String algorithm
 
     ) throws Exception {
@@ -54,8 +58,10 @@ public class JwtServiceImpl implements JwtService {
         this.issuer = issuer;
         this.accessExpiration = accessExpiration;
         this.refreshExpiration = refreshExpiration;
+        this.verificationExpiration = verificationExpiration;
         this.accessTokenType = accessTokenType;
         this.refreshTokenType = refreshTokenType;
+        this.verificationTokenType = verificationTokenType;
         this.publicKeyResource = publicKeyResource;
 
 
@@ -83,6 +89,16 @@ public class JwtServiceImpl implements JwtService {
             log.error("Failed to load private key", e);
             throw e;
         }
+    }
+
+    public String generateEmailVerificationToken(UserEntity user) {
+        var claims = Jwts.claims()
+            .subject(user.getId().toString())
+            .add("typ", verificationTokenType)
+            .add("email", user.getEmail())
+            .build();
+
+        return buildToken(claims, verificationExpiration).token();
     }
 
     public GeneratedToken generateAccessToken(UserEntity user, UUID sessionId) {
@@ -141,5 +157,22 @@ public class JwtServiceImpl implements JwtService {
         } catch (JwtException e) {
             throw new BusinessException("Невалидный или просроченный токен обновления", "INVALID_TOKEN", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    public Claims parseToken(String token, String expectedType) {
+        Claims claims = parseToken(token);
+
+        String actualType = claims.get("typ", String.class);
+
+        if (!expectedType.equals(actualType)) {
+            throw new BusinessException(
+                "Invalid token type",
+                "AUTH_INVALID_TOKEN_TYPE",
+                HttpStatus.BAD_REQUEST,
+                Map.of("expected", expectedType, "actual", String.valueOf(actualType))
+            );
+        }
+
+        return claims;
     }
 }

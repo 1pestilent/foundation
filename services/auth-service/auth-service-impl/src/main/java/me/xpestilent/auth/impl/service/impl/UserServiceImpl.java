@@ -2,22 +2,20 @@ package me.xpestilent.auth.impl.service.impl;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import io.jsonwebtoken.Claims;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.xpestilent.auth.api.dto.request.LoginRequest;
 import me.xpestilent.auth.api.dto.request.RegisterRequest;
-import me.xpestilent.auth.api.dto.response.GeneratedToken;
 import me.xpestilent.auth.api.dto.response.LoginResponse;
 import me.xpestilent.auth.api.dto.response.RegisterResponse;
+import me.xpestilent.auth.api.enums.UserStatus;
 import me.xpestilent.auth.api.event.UserRegisteredEvent;
-import me.xpestilent.auth.impl.entity.RefreshTokenEntity;
 import me.xpestilent.auth.impl.entity.UserEntity;
 import me.xpestilent.auth.impl.mapper.UserMapper;
-import me.xpestilent.auth.impl.repository.RefreshTokenRepository;
 import me.xpestilent.auth.impl.repository.UserRepository;
 import me.xpestilent.auth.impl.service.JwtService;
 import me.xpestilent.auth.impl.service.RoleService;
+import me.xpestilent.auth.impl.service.TokenService;
 import me.xpestilent.auth.impl.service.UserService;
 import me.xpestilent.foundation.outbox.publisher.EventPublisher;
 import me.xpestilent.foundation.web.exception.BusinessException;
@@ -25,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.UUID;
@@ -42,8 +41,11 @@ public class UserServiceImpl implements UserService {
     @Value("${foundation.security.jwt.expiration.access}")
     long accessExpiration;
 
+    @Value("${foundation.security.jwt.type.verification}")
+    String verificationTokenType;
+
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenService tokenService;
     private final UserMapper userMapper;
     private final RoleService roleService;
     private final EventPublisher eventPublisher;
@@ -78,6 +80,8 @@ public class UserServiceImpl implements UserService {
         roleService.assignDefaultRole(user);
         user = userRepository.save(user);
 
+        String verificationToken = jwtService.generateEmailVerificationToken(user);
+
         log.debug("User entity successfully saved to database", keyValue("userId", user.getId()));
 
         UserRegisteredEvent event = UserRegisteredEvent.builder()
@@ -85,7 +89,9 @@ public class UserServiceImpl implements UserService {
             .aggregateId(user.getId().toString())
             .username(user.getUsername())
             .email(user.getEmail())
+            .verificationToken(verificationToken)
             .build();
+
 
         eventPublisher.publish(event);
 
@@ -113,89 +119,68 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("Неверный логин или пароль", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
         }
 
-        UUID jti = UuidCreator.getTimeOrderedEpoch();
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            handleInactiveStatus(user);
+        }
 
-        GeneratedToken access = jwtService.generateAccessToken(user, jti);
-        GeneratedToken refresh = jwtService.generateRefreshToken(user, jti);
-
-        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
-            .jti(jti)
-            .user(user)
-            .ipAddress(ip)
-            .userAgent(userAgent)
-            .deviceId(deviceId)
-            .expiresAt(refresh.expiresAt())
-            .build();
-
-        refreshTokenRepository.save(refreshToken);
-
-        log.info("User logged in successfully", keyValue("userId", user.getId()), keyValue("jti", jti));
-
-        return new LoginResponse(
-            access.token(),
-            refresh.token(),
-            tokensType,
-            accessExpiration / 1000,
-            access.expiresAt().toEpochMilli()
-        );
+        return tokenService.createSession(user, ip, userAgent, deviceId);
     }
 
     @Override
     @Transactional
-    public LoginResponse refresh(String refreshToken, String ip, String userAgent, String deviceId) {
+    public void verifyEmail(String verificationToken) {
+        Claims claims = jwtService.parseToken(verificationToken, verificationTokenType);
 
-        Claims claims;
+        UUID userId = UUID.fromString(claims.getSubject());
 
-        try {
-            claims = jwtService.parseToken(refreshToken);
-        } catch (Exception e) {
-            log.warn("Invalid refresh token provided", keyValue("error", e.getMessage()));
-            throw new BusinessException("Невалидный токен обновления", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new BusinessException(
+                    "User not found",
+                    "USER_NOT_FOUND",
+                    HttpStatus.NOT_FOUND,
+                    Map.of("userId", userId.toString())
+                )
+            );
+
+        if (user.getStatus() == UserStatus.ACTIVE) {
+            throw new BusinessException(
+                "Email is already verified",
+                "AUTH_EMAIL_ALREADY_VERIFIED",
+                HttpStatus.BAD_REQUEST,
+                Map.of("email", user.getEmail())
+            );
         }
 
-        if (!"refresh".equals(claims.get("typ"))) {
-            throw new BusinessException("Ожидается токен типа refresh", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
+        user.setStatus(UserStatus.ACTIVE);
+    }
+
+    private void handleInactiveStatus(UserEntity user) {
+
+        log.warn("Attempt to login with non-active status",
+            keyValue("userId", user.getId()),
+            keyValue("status", user.getStatus())
+        );
+
+        if (user.getStatus() == UserStatus.NOT_VERIFIED) {
+            throw new BusinessException(
+                "Пожалуйста, подтвердите ваш email перед входом",
+                "AUTH_EMAIL_NOT_VERIFIED",
+                HttpStatus.FORBIDDEN
+            );
         }
 
-        UUID jti = UUID.fromString(claims.get("jti", String.class));
-        RefreshTokenEntity session = refreshTokenRepository.findById(jti)
-            .orElseThrow(() -> {
-                log.warn("Refresh token reuse attempt or session expired", keyValue("jti", jti));
-                return new BusinessException("Сессия не найдена или уже обновлена", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
-            });
-
-        if (session.getDeviceId() != null && !session.getDeviceId().equals(deviceId)) {
-            log.error("Device ID mismatch! Deleting compromised session.", keyValue("jti", jti));
-            refreshTokenRepository.delete(session);
-            throw new BusinessException("Попытка доступа с неизвестного устройства", "FORBIDDEN", HttpStatus.FORBIDDEN);
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            throw new BusinessException(
+                "Ваш аккаунт заблокирован. Пожалуйста, свяжитесь с поддержкой.",
+                "AUTH_USER_BANNED",
+                HttpStatus.FORBIDDEN
+            );
         }
 
-        UserEntity user = session.getUser();
-        refreshTokenRepository.delete(session);
-
-        UUID newJti = UuidCreator.getTimeOrderedEpoch();
-        GeneratedToken newAccess = jwtService.generateAccessToken(user, newJti);
-        GeneratedToken newRefresh = jwtService.generateRefreshToken(user, newJti);
-
-        RefreshTokenEntity newSession = RefreshTokenEntity.builder()
-            .jti(newJti)
-            .user(user)
-            .ipAddress(ip)
-            .userAgent(userAgent)
-            .deviceId(deviceId)
-            .expiresAt(newRefresh.expiresAt())
-            .build();
-
-        refreshTokenRepository.save(newSession);
-
-        log.info("Token successfully rotated", keyValue("userId", user.getId()), keyValue("oldJti", jti), keyValue("newJti", newJti));
-
-        return new LoginResponse(
-            newAccess.token(),
-            newRefresh.token(),
-            tokensType,
-            accessExpiration / 1000,
-            newAccess.expiresAt().toEpochMilli()
+        throw new BusinessException(
+            "Вход в систему временно невозможен",
+            "AUTH_ACCOUNT_INACTIVE",
+            HttpStatus.FORBIDDEN
         );
     }
 }

@@ -13,7 +13,5 @@ public interface UserService {
         LoginRequest request, String ip, String userAgent, String deviceId
     );
 
-    LoginResponse refresh(
-        String refreshToken, String ip, String userAgent, String deviceId
-    );
+    void verifyEmail(String verificationToken);
 }

@@ -29,6 +29,8 @@ public class UserRegisteredEvent implements DomainEvent {
 
     private String email;
 
+    private String verificationToken;
+
     @Override
     public UUID getEventId() {
         return eventId;

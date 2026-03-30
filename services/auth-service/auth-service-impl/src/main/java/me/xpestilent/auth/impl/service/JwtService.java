@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public interface JwtService {
 
+    String generateEmailVerificationToken(UserEntity user);
+
     GeneratedToken generateAccessToken(UserEntity user, UUID sessionId);
 
     GeneratedToken generateRefreshToken(UserEntity user, UUID jti);
@@ -15,4 +17,6 @@ public interface JwtService {
     String getPublicKeyPem();
 
     Claims parseToken(String token);
+
+    Claims parseToken(String token, String tokenType);
 }
