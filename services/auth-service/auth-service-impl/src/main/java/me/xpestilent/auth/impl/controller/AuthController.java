@@ -39,11 +39,9 @@ public class AuthController implements AuthApi {
     ) {
         LoginResponse response = userService.login(
             request,
-            clientInfo.ip(),
-            clientInfo.userAgent(),
-            clientInfo.deviceId()
+            clientInfo
         );
-        
+
         return ApiResponse.success(response, 200);
     }
 
@@ -61,9 +59,7 @@ public class AuthController implements AuthApi {
 
         LoginResponse response = tokenService.rotateSession(
             token,
-            clientInfo.ip(),
-            clientInfo.userAgent(),
-            clientInfo.deviceId()
+            clientInfo
         );
         return ApiResponse.success(response, 200);
     }

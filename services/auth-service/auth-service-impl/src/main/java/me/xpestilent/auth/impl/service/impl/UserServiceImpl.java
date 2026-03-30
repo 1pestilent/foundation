@@ -17,6 +17,7 @@ import me.xpestilent.auth.impl.service.JwtService;
 import me.xpestilent.auth.impl.service.RoleService;
 import me.xpestilent.auth.impl.service.TokenService;
 import me.xpestilent.auth.impl.service.UserService;
+import me.xpestilent.foundation.model.ClientInfo;
 import me.xpestilent.foundation.outbox.publisher.EventPublisher;
 import me.xpestilent.foundation.web.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
@@ -107,9 +108,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public LoginResponse login(
         LoginRequest request,
-        String ip,
-        String userAgent,
-        String deviceId
+        ClientInfo clientInfo
     ) {
         UserEntity user = userRepository.findByUsername(request.username())
             .orElseThrow(() -> new BusinessException("Неверный логин или пароль", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED));
@@ -123,7 +122,7 @@ public class UserServiceImpl implements UserService {
             handleInactiveStatus(user);
         }
 
-        return tokenService.createSession(user, ip, userAgent, deviceId);
+        return tokenService.createSession(user, clientInfo);
     }
 
     @Override

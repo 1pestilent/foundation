@@ -28,9 +28,11 @@ public class ClientInfoArgumentResolver implements HandlerMethodArgumentResolver
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 
         String ip = request.getHeader("X-Forwarded-For");
+
         if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("X-Real-IP");
         }
+
         if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }

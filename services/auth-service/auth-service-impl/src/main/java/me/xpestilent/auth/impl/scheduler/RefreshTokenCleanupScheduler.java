@@ -18,7 +18,7 @@ public class RefreshTokenCleanupScheduler {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    @Scheduled(fixedDelay = 10000)
+    @Scheduled(cron = "0 0 * * * *")
     @SchedulerLock(name = "cleanupTokens", lockAtMostFor = "10m", lockAtLeastFor = "1m")
     public void cleanupExpiredTokens() {
         log.info("Starting cleanup of expired refresh tokens...");

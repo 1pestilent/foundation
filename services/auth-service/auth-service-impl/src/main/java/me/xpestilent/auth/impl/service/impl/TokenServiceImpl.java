@@ -11,6 +11,7 @@ import me.xpestilent.auth.impl.entity.UserEntity;
 import me.xpestilent.auth.impl.repository.RefreshTokenRepository;
 import me.xpestilent.auth.impl.service.JwtService;
 import me.xpestilent.auth.impl.service.TokenService;
+import me.xpestilent.foundation.model.ClientInfo;
 import me.xpestilent.foundation.web.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
-    public LoginResponse createSession(UserEntity user, String ip, String userAgent, String deviceId) {
+    public LoginResponse createSession(UserEntity user, ClientInfo clientInfo) {
         UUID jti = UuidCreator.getTimeOrderedEpoch();
 
         GeneratedToken access = jwtService.generateAccessToken(user, jti);
@@ -50,9 +51,9 @@ public class TokenServiceImpl implements TokenService {
         RefreshTokenEntity session = RefreshTokenEntity.builder()
             .jti(jti)
             .user(user)
-            .ipAddress(ip)
-            .userAgent(userAgent)
-            .deviceId(deviceId)
+            .ipAddress(clientInfo.ip())
+            .userAgent(clientInfo.userAgent())
+            .deviceId(clientInfo.deviceId())
             .expiresAt(refresh.expiresAt())
             .build();
 
@@ -73,7 +74,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY, noRollbackFor = BusinessException.class)
-    public LoginResponse rotateSession(String refreshToken, String ip, String userAgent, String deviceId) {
+    public LoginResponse rotateSession(String refreshToken, ClientInfo clientInfo) {
         Claims claims;
         try {
             claims = jwtService.parseToken(refreshToken, refreshTokenType);
@@ -90,7 +91,7 @@ public class TokenServiceImpl implements TokenService {
                 return new BusinessException("Сессия не найдена или уже обновлена", "UNAUTHORIZED", HttpStatus.UNAUTHORIZED);
             });
 
-        if (session.getDeviceId() != null && !session.getDeviceId().equals(deviceId)) {
+        if (session.getDeviceId() != null && !session.getDeviceId().equals(clientInfo.deviceId())) {
             log.error("Device ID mismatch! Deleting compromised session.", keyValue("jti", jti));
             refreshTokenRepository.delete(session);
             throw new BusinessException("Попытка доступа с неизвестного устройства", "FORBIDDEN", HttpStatus.FORBIDDEN);
@@ -100,6 +101,6 @@ public class TokenServiceImpl implements TokenService {
 
         refreshTokenRepository.delete(session);
 
-        return createSession(user, ip, userAgent, deviceId);
+        return createSession(user, clientInfo);
     }
 }
