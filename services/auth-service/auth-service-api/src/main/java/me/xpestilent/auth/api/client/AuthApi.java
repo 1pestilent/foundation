@@ -45,7 +45,7 @@ public interface AuthApi {
     @GetMapping("/verify")
     @ResponseStatus(HttpStatus.OK)
     ApiResponse<String> verifyEmail(
-        @RequestParam String verificationToken
+        @RequestParam String token
     );
 }
 

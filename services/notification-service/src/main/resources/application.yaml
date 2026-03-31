@@ -1,0 +1,43 @@
+server:
+  port: 8083
+spring:
+  profiles:
+    active: dev
+  application:
+    name: notification-service
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/foundation_db?schema=notification_schema
+    username: admin
+    password: admin
+
+  liquibase:
+    change-log: classpath:db/changelog/changelog.yaml
+    url: jdbc:postgresql://localhost:5432/foundation_db
+    user: admin
+    password: admin
+    default-schema: notification_schema
+
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  kafka:
+    bootstrap-servers: localhost:19092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+app:
+  auth:
+    verify-url: "http://localhost:8080/api/v1/auth/verify?token="
+topics:
+  user: foundation.user.events

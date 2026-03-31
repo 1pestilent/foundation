@@ -29,6 +29,7 @@
         <module>libs/foundation-security-starter</module>
         <module>services/api-gateway</module>
         <module>libs/foundation-kafka-starter</module>
+        <module>services/notification-service</module>
     </modules>
 
 

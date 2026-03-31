@@ -94,19 +94,12 @@ services:
       connect:
         condition: service_healthy
 
-  redis:
-    image: redis:7-alpine
-    container_name: foundation-redis
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: foundation-mailhog
     ports:
-      - "6379:6379"
-    command: redis-server --save 60 1 --loglevel warning
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   foundation_db_data:

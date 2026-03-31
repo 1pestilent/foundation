@@ -70,8 +70,8 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    public ApiResponse<String> verifyEmail(String verificationToken) {
-        userService.verifyEmail(verificationToken);
+    public ApiResponse<String> verifyEmail(String token) {
+        userService.verifyEmail(token);
         return ApiResponse.success("Email успешно подтвержден. Теперь вы можете войти в систему.");
     }
 }

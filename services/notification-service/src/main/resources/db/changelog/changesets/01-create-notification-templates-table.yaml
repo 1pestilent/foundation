@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 01-create-notification-templates-table
+      author: xpestilent
+      changes:
+        - createTable:
+            tableName: notification_templates
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: subject
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: html_body
+                  type: TEXT
+                  constraints:
+                    nullable: false

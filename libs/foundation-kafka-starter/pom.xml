@@ -36,7 +36,6 @@
         <dependency>
             <groupId>me.xpestilent</groupId>
             <artifactId>foundation-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -58,7 +57,6 @@
         <dependency>
             <groupId>io.projectreactor.kafka</groupId>
             <artifactId>reactor-kafka</artifactId>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -70,7 +68,6 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing</artifactId>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
